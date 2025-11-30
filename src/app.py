@@ -9,13 +9,19 @@ from data_collector import YouTubeTrailerCollector, extract_video_id
 
 
 def load_api_key():
-    """Load API Key from environment variable."""
-    dotenv.load_dotenv()
-    # NOTE: In a production environment, you would use Streamlit secrets
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    # For local testing convenience, use a placeholder if not set
+    """Load API Key from Streamlit secrets or environment."""
+    try:
+        # Try Streamlit secrets first (for cloud deployment)
+        api_key = st.secrets["YOUTUBE_API_KEY"]
+    except:
+        # Fallback to environment variable (for local)
+        dotenv.load_dotenv()
+        api_key = os.getenv("YOUTUBE_API_KEY")
+
     if not api_key:
-        api_key = "YOUR_YOUTUBE_API_KEY_HERE"
+        st.error("⚠️ YouTube API Key not found! Add it to Streamlit secrets.")
+        st.stop()
+
     return api_key
 
 
